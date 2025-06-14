@@ -1,100 +1,147 @@
--- LawakHub Blox Fruits Script
+--[[ 
+    LawakHub - Blox Fruits Script
+    ByToni (Jaksel) | UI: Modern + Floating Logo
+]]
+
 repeat wait() until game:IsLoaded()
 
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
-local Window = Library.CreateLib("LawakHub | Blox Fruits", "Ocean")
+-- UI Loader
+local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Orion/main/source"))()
+local Window = OrionLib:MakeWindow({
+    Name = "LawakHub | Blox Fruits",
+    HidePremium = false,
+    SaveConfig = true,
+    ConfigFolder = "LawakHub",
+    IntroEnabled = false
+})
 
--- Tab
-local Main = Window:NewTab("Auto Farm")
-local Section = Main:NewSection("Auto Leveling")
+-- Watermark
+local watermark = Instance.new("TextLabel")
+watermark.Text = "ByToni"
+watermark.TextColor3 = Color3.fromRGB(255,255,255)
+watermark.BackgroundColor3 = Color3.fromRGB(0,0,0)
+watermark.BackgroundTransparency = 0.5
+watermark.Size = UDim2.new(0, 100, 0, 25)
+watermark.Position = UDim2.new(1, -110, 1, -35)
+watermark.TextScaled = true
+watermark.Font = Enum.Font.Gotham
+watermark.BorderSizePixel = 0
+watermark.Parent = game.CoreGui
 
-local Weapon = "Melee" -- Default
-local AutoFarm = false
-local AutoBoss = false
+-- [ MAIN TAB ]
+local MainTab = Window:MakeTab({ Name = "Main", Icon = "rbxassetid://4483345998", PremiumOnly = false })
 
--- Dropdown Weapon
-Section:NewDropdown("Pilih Senjata", "Pilih jenis serangan", {"Melee", "Sword", "Fruit"}, function(option)
-    Weapon = option
-end)
-
--- Toggle Auto Farm
-Section:NewToggle("Auto Farm Level", "Farm level otomatis", function(state)
-    AutoFarm = state
-end)
-
--- Toggle Farm Boss
-Section:NewToggle("Auto Farm Boss", "Farm boss otomatis", function(state)
-    AutoBoss = state
-end)
-
--- Code Auto Farm (contoh sederhana)
-spawn(function()
-    while true do wait()
-        if AutoFarm then
+MainTab:AddToggle({
+    Name = "Auto Farm Level",
+    Default = false,
+    Callback = function(v)
+        _G.AutoFarm = v
+        while _G.AutoFarm and task.wait() do
             pcall(function()
-                -- logika farming berdasarkan Weapon
-                print("Farming menggunakan: "..Weapon)
-                -- tambahkan logika farming di sini sesuai kebutuhan
+                -- your farming logic here
             end)
         end
     end
-end)
+})
 
--- Tab Raid & Lainnya
-local Raid = Window:NewTab("Raid & Misc")
-local RaidSec = Raid:NewSection("Auto")
-
-RaidSec:NewToggle("Auto Raid + Kill Aura", "Raid otomatis dengan serang cepat", function(state)
-    _G.AutoRaid = state
-end)
-
-RaidSec:NewButton("Redeem Semua Code", "Klaim semua code aktif", function()
-    local codes = {"kittgaming", "sub2fer999", "Axiore", "Sub2Daigrock", "TantaiGaming"}
-    for _,v in pairs(codes) do
-        pcall(function()
-            game:GetService("ReplicatedStorage").Remotes.Redeem:InvokeServer(v)
-        end)
-    end
-end)
-
--- Auto Haki
-spawn(function()
-    while wait(1) do
-        if not game.Players.LocalPlayer.Character:FindFirstChild("HasBuso") then
-            game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("Buso")
+MainTab:AddToggle({
+    Name = "Bring Mob",
+    Default = false,
+    Callback = function(v)
+        _G.BringMob = v
+        while _G.BringMob and wait() do
+            -- bring mob logic
         end
     end
-end)
+})
 
--- FPS Boost
-local Settings = Window:NewTab("Settings")
-local SetSec = Settings:NewSection("Utility")
+-- [ RAID TAB ]
+local RaidTab = Window:MakeTab({ Name = "Raid", Icon = "rbxassetid://4483345998", PremiumOnly = false })
 
-SetSec:NewButton("Boost FPS", "Matikan efek untuk ringan", function()
-    for i,v in pairs(game:GetDescendants()) do
-        if v:IsA("Texture") or v:IsA("ParticleEmitter") or v:IsA("Trail") then
-            v:Destroy()
+RaidTab:AddButton({
+    Name = "Auto Buy Raid Chip",
+    Callback = function()
+        -- buy chip logic
+    end
+})
+
+RaidTab:AddToggle({
+    Name = "Auto Start & Next Island",
+    Default = false,
+    Callback = function(v)
+        _G.AutoRaid = v
+        while _G.AutoRaid and wait() do
+            -- auto raid logic
         end
     end
-end)
+})
 
--- Auto Chest
-local function CollectChests()
-    for _,v in pairs(workspace:GetDescendants()) do
-        if v.Name:lower():find("chest") and v:IsA("Model") then
-            pcall(function()
-                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.PrimaryPart.CFrame
-                wait(1)
-            end)
-        end
+RaidTab:AddToggle({
+    Name = "Kill Aura",
+    Default = false,
+    Callback = function(v)
+        _G.KillAura = v
+        -- kill aura logic here
     end
-end
+})
 
-SetSec:NewButton("Auto Chest (Sekali Klik)", "Ambil semua chest", CollectChests)
+-- [ FRUIT TAB ]
+local FruitTab = Window:MakeTab({ Name = "Fruit", Icon = "rbxassetid://4483345998", PremiumOnly = false })
 
--- Save Config (dummy)
-SetSec:NewButton("Save Config", "Simpan pengaturan (simulasi)", function()
-    print("Config tersimpan! (simulasi)")
-end)
+FruitTab:AddButton({ Name = "Auto Random Fruit", Callback = function() -- logic end })
 
--- End
+FruitTab:AddToggle({
+    Name = "ESP Fruit",
+    Default = false,
+    Callback = function(v)
+        _G.ESPfruit = v
+        -- ESP logic
+    end
+})
+
+FruitTab:AddToggle({
+    Name = "Fruit Sniper",
+    Default = false,
+    Callback = function(v)
+        _G.SnipeFruit = v
+        -- Snipe logic
+    end
+})
+
+-- [ SEA EVENT TAB ]
+local SeaTab = Window:MakeTab({ Name = "Sea Event", Icon = "rbxassetid://4483345998", PremiumOnly = false })
+
+SeaTab:AddToggle({
+    Name = "Auto Terror Shark",
+    Default = false,
+    Callback = function(v)
+        _G.TerrorShark = v
+        -- terror shark logic
+    end
+})
+
+-- [ SHOP TAB ]
+local ShopTab = Window:MakeTab({ Name = "Shop", Icon = "rbxassetid://4483345998", PremiumOnly = false })
+
+ShopTab:AddButton({ Name = "Buy Haki", Callback = function() -- haki logic end })
+ShopTab:AddButton({ Name = "Buy Superhuman", Callback = function() -- buy logic end })
+ShopTab:AddButton({ Name = "Change Race", Callback = function() -- race logic end })
+
+-- [ SETTINGS ]
+local SetTab = Window:MakeTab({ Name = "Settings", Icon = "rbxassetid://4483345998", PremiumOnly = false })
+
+SetTab:AddButton({
+    Name = "FPS Boost",
+    Callback = function()
+        -- fps boost
+        for _,v in pairs(game:GetDescendants()) do
+            if v:IsA("Part") or v:IsA("MeshPart") then
+                v.Material = Enum.Material.SmoothPlastic
+                v.Reflectance = 0
+            end
+        end
+        sethiddenproperty(game:GetService("Lighting"), "Technology", Enum.Technology.Compatibility)
+    end
+})
+
+OrionLib:Init()
