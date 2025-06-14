@@ -1,115 +1,100 @@
---- LawakHub – Grow a Garden with GUI & Auto-run
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+-- LawakHub Blox Fruits Script
+repeat wait() until game:IsLoaded()
 
--- 🛡 Anti Lag
-local function noLag()
-  for _, v in pairs(game:GetDescendants()) do
-    if v:IsA("ParticleEmitter") or v:IsA("Trail") then v:Destroy() end
-    if v:IsA("BlurEffect") or v:IsA("SunRaysEffect") or v:IsA("ColorCorrectionEffect") or v:IsA("BloomEffect") then
-      v.Enabled = false
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+local Window = Library.CreateLib("LawakHub | Blox Fruits", "Ocean")
+
+-- Tab
+local Main = Window:NewTab("Auto Farm")
+local Section = Main:NewSection("Auto Leveling")
+
+local Weapon = "Melee" -- Default
+local AutoFarm = false
+local AutoBoss = false
+
+-- Dropdown Weapon
+Section:NewDropdown("Pilih Senjata", "Pilih jenis serangan", {"Melee", "Sword", "Fruit"}, function(option)
+    Weapon = option
+end)
+
+-- Toggle Auto Farm
+Section:NewToggle("Auto Farm Level", "Farm level otomatis", function(state)
+    AutoFarm = state
+end)
+
+-- Toggle Farm Boss
+Section:NewToggle("Auto Farm Boss", "Farm boss otomatis", function(state)
+    AutoBoss = state
+end)
+
+-- Code Auto Farm (contoh sederhana)
+spawn(function()
+    while true do wait()
+        if AutoFarm then
+            pcall(function()
+                -- logika farming berdasarkan Weapon
+                print("Farming menggunakan: "..Weapon)
+                -- tambahkan logika farming di sini sesuai kebutuhan
+            end)
+        end
     end
-  end
-  if workspace:FindFirstChild("Terrain") then workspace.Terrain:Clear() end
-  local L = game:GetService("Lighting")
-  L.GlobalShadows = false
-  L.FogEnd = 1e6
-  for _, d in pairs(game:GetDescendants()) do
-    if d:IsA("Decal") then d.Transparency = 1 end
-    if d:IsA("MeshPart") then d.Material = Enum.Material.SmoothPlastic end
-  end
-end
-
-noLag()
-
--- 🌱 Upgrade Logic
-local plantLevel = 1
-local plantsPlanted = 0
-local maxLevel = 5
-local levelData = {
-  [1] = {size = 2, color = "Bright green"},
-  [2] = {size = 3, color = "Earth green"},
-  [3] = {size = 4, color = "Bright yellow"},
-  [4] = {size = 5, color = "Bright orange"},
-  [5] = {size = 6, color = "Bright red"},
-}
-
--- 🚀 Create Plant
-local function createPlant()
-  local cfg = levelData[plantLevel] or levelData[1]
-  local part = Instance.new("Part")
-  part.Shape = Enum.PartType.Ball
-  part.Material = Enum.Material.Grass
-  part.Size = Vector3.new(cfg.size, cfg.size, cfg.size)
-  part.BrickColor = BrickColor.new(cfg.color)
-  part.Anchored = true
-  part.CanCollide = false
-  part.Position = LocalPlayer.Character.HumanoidRootPart.Position + Vector3.new(0, -2.5, -5)
-  part.Parent = workspace
-
-  plantsPlanted += 1
-  if plantsPlanted % 5 == 0 and plantLevel < maxLevel then
-    plantLevel += 1
-    infoLabel.Text = "🌟 Level Up! Sekarang Level " .. plantLevel
-  end
-end
-
--- 🎁 Buat GUI
-local screenGui = Instance.new("ScreenGui", PlayerGui)
-screenGui.Name = "GrowGardenGui"
-
-local button = Instance.new("TextButton", screenGui)
-button.Size = UDim2.new(0, 150, 0, 50)
-button.Position = UDim2.new(0, 20, 0, 20)
-button.Text = "🌱 Plant"
-button.Font = Enum.Font.SourceSansBold
-button.TextSize = 24
-
-local upBtn = button:Clone()
-upBtn.Position = UDim2.new(0, 20, 0, 80)
-upBtn.Text = "⬆ Upgrade"
-
-local infoLabel = Instance.new("TextLabel", screenGui)
-infoLabel.Size = UDim2.new(0, 200, 0, 30)
-infoLabel.Position = UDim2.new(0, 20, 0, 140)
-infoLabel.Text = "Level: 1 | Plants: 0"
-infoLabel.TextSize = 18
-infoLabel.BackgroundTransparency = 1
-infoLabel.TextXAlignment = Enum.TextXAlignment.Left
-
-button.MouseButton1Click:Connect(function()
-  createPlant()
-  infoLabel.Text = "Level: " .. plantLevel .. " | Plants: " .. plantsPlanted
 end)
 
-upBtn.MouseButton1Click:Connect(function()
-  if plantLevel < maxLevel then
-    plantLevel += 1
-    infoLabel.Text = "Level: " .. plantLevel .. " | Plants: " .. plantsPlanted
-    infoLabel.Text = "🌟 Level Up! Sekarang Level " .. plantLevel
-    wait(2)
-    infoLabel.Text = "Level: " .. plantLevel .. " | Plants: " .. plantsPlanted
-  else
-    infoLabel.Text = "🔝 Sudah di Level Max!"
-    wait(2)
-    infoLabel.Text = "Level: " .. plantLevel .. " | Plants: " .. plantsPlanted
-  end
+-- Tab Raid & Lainnya
+local Raid = Window:NewTab("Raid & Misc")
+local RaidSec = Raid:NewSection("Auto")
+
+RaidSec:NewToggle("Auto Raid + Kill Aura", "Raid otomatis dengan serang cepat", function(state)
+    _G.AutoRaid = state
 end)
 
--- 📦 Cek isi egg & event
-local function showInfo()
-  local RS = game:GetService("ReplicatedStorage")
-  print("📦 Eggs:")
-  if RS:FindFirstChild("Eggs") then
-    for _, e in ipairs(RS.Eggs:GetChildren()) do print(" - "..e.Name) end
-  end
-  print("🎉 StockEvents:")
-  if RS:FindFirstChild("StockEvents") then
-    for _, e in ipairs(RS.StockEvents:GetChildren()) do print(" - "..e.Name) end
-  end
+RaidSec:NewButton("Redeem Semua Code", "Klaim semua code aktif", function()
+    local codes = {"kittgaming", "sub2fer999", "Axiore", "Sub2Daigrock", "TantaiGaming"}
+    for _,v in pairs(codes) do
+        pcall(function()
+            game:GetService("ReplicatedStorage").Remotes.Redeem:InvokeServer(v)
+        end)
+    end
+end)
+
+-- Auto Haki
+spawn(function()
+    while wait(1) do
+        if not game.Players.LocalPlayer.Character:FindFirstChild("HasBuso") then
+            game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("Buso")
+        end
+    end
+end)
+
+-- FPS Boost
+local Settings = Window:NewTab("Settings")
+local SetSec = Settings:NewSection("Utility")
+
+SetSec:NewButton("Boost FPS", "Matikan efek untuk ringan", function()
+    for i,v in pairs(game:GetDescendants()) do
+        if v:IsA("Texture") or v:IsA("ParticleEmitter") or v:IsA("Trail") then
+            v:Destroy()
+        end
+    end
+end)
+
+-- Auto Chest
+local function CollectChests()
+    for _,v in pairs(workspace:GetDescendants()) do
+        if v.Name:lower():find("chest") and v:IsA("Model") then
+            pcall(function()
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.PrimaryPart.CFrame
+                wait(1)
+            end)
+        end
+    end
 end
 
-showInfo()
+SetSec:NewButton("Auto Chest (Sekali Klik)", "Ambil semua chest", CollectChests)
 
-print("Grow a Garden GUI siap! Tekan tombol di kiri atas untuk mulai.")
+-- Save Config (dummy)
+SetSec:NewButton("Save Config", "Simpan pengaturan (simulasi)", function()
+    print("Config tersimpan! (simulasi)")
+end)
+
+-- End
